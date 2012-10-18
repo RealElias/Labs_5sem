@@ -14,7 +14,9 @@ namespace tpr2
 
         public Entity()
         {
-
+            this.X = 0;
+            this.Y = 0;
+            this.Class = 0;
         }
 
         public Entity(Int32 X, Int32 Y, Int32 Class)

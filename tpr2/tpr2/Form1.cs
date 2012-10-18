@@ -14,23 +14,38 @@ namespace tpr2
     public partial class Form1 : Form
     {
         public Core core;
+        private bool Calculate;
+        private Entity CurRule { get; set; }
+        private PointPairList ControlPoints; 
 
         public Form1()
         {
-            core = new Core();
             InitializeComponent();
+            ControlPoints = new PointPairList();
+            CurRule = new Entity();
+            Calculate = false;
+            core = new Core();
+            DrawGraph(core.AnalitCalculateLine());
         }
 
         private void bCalculate_Click(object sender, EventArgs e)
         {
             if (maskedTextBox1.Text != "")
             {
-                Cursor = Cursors.WaitCursor;
-                Entity weightVector = core.CalculateLine(double.Parse(maskedTextBox1.Text));
-                Cursor = Cursors.Arrow;
-                textBox1.Text = weightVector.X.ToString() + "x + " + weightVector.Y.ToString() + "y + " + weightVector.Class.ToString() + " = 0";
-                core.SetCoefficientes(weightVector);
-                DrawGraph();
+                if (double.Parse(maskedTextBox1.Text) <= 0 || double.Parse(maskedTextBox1.Text) > 1)
+                {
+                    textBox1.Text = "Коэффициент должен быть 0 < a <= 1";
+                }
+                else
+                {
+                    Cursor = Cursors.WaitCursor;
+                    Entity weightVector = core.CalculateLine(double.Parse(maskedTextBox1.Text), zedGraph);
+                    textBox1.Text = weightVector.X.ToString() + "     " + weightVector.Y.ToString() + "     " +
+                                    weightVector.Class.ToString();
+                    CurRule = weightVector;
+                    Cursor = Cursors.Arrow;
+                    Calculate = true;
+                }
             }
             else
             {
@@ -48,22 +63,24 @@ namespace tpr2
             }
         }
 
-        public void DrawGraph()
+        public void DrawGraph(Entity avector)
         {
             GraphPane pane = zedGraph.GraphPane;
             pane.CurveList.Clear();
+            ControlPoints.Clear();
 
-            var list = new PointPairList();
+            var lista = new PointPairList();
             var class0List = new PointPairList();
             var class1List = new PointPairList();
 
-            for (double x = 0; x <= 8; x += 0.1)
+            core.SetCoefficientes(avector);
+            for (double x = 2; x <= 6; x += 0.1)
             {
                 double f = core.F(x);
-                if(f < 8 && f > 0)
-                    list.Add(x, f);
+                if (f < 16 && f > 0)
+                    lista.Add(x, f);
             }
-
+            pane.AddCurve("Решающее правило(аналит)", lista, Color.Blue, SymbolType.None);
 
             foreach (Entity e in core.TeachingRow)
             {
@@ -73,7 +90,6 @@ namespace tpr2
                     class1List.Add(e.X, e.Y);
             }
 
-            LineItem myCurve = pane.AddCurve("Решающее правило", list, Color.Blue, SymbolType.None);
             LineItem class0 = pane.AddCurve("Класс 0", class0List, Color.Green, SymbolType.Diamond);
             LineItem class1 = pane.AddCurve("Класс 1", class1List, Color.Red, SymbolType.Triangle);
 
@@ -82,11 +98,34 @@ namespace tpr2
             class1.Line.IsVisible = false;
             class1.Symbol.Fill.Type = FillType.Solid;
 
-            zedGraph.ScrollMaxY = 10;
-            zedGraph.ScrollMinY = 0;
             zedGraph.AxisChange();
 
             zedGraph.Invalidate();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (!Calculate) return;
+            textBox4.Text = CheckClass(double.Parse(textBox2.Text), double.Parse(textBox3.Text));
+            DrawPoint();
+        }
+
+        public void DrawPoint()
+        {
+            GraphPane pane = zedGraph.GraphPane;
+            if(ControlPoints.Count != 1)           
+                pane.CurveList.RemoveAt(pane.CurveList.Count-1);
+            LineItem Points = pane.AddCurve("Контрольные значения", ControlPoints, Color.DarkOrchid, SymbolType.Square);
+            Points.Line.IsVisible = false;
+            Points.Symbol.Fill.Type = FillType.Solid;
+            zedGraph.AxisChange();
+            zedGraph.Invalidate();
+        }
+
+        private string CheckClass(double p1, double p2)
+        {
+            ControlPoints.Add(p1, p2);
+            return CurRule.X*p1 + CurRule.Y*p2 + CurRule.Class < 0 ? "0" : "1";
         }
     }
 }
