@@ -57,6 +57,10 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
+*\obj
+*\bin
+*\Properties
+
 *.cd
 *.pdb
 *.cache
