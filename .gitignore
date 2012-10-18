@@ -7,7 +7,6 @@
 *.o
 *.so
 *.suo
-*.config
 
 # Debug #
 ############
@@ -60,6 +59,7 @@ Thumbs.db
 *\obj
 *\bin
 *\Properties
+*\_ReSharper.tpr2
 
 *.cd
 *.pdb
