@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace tpr2
 {
     public class Core
     {
 
-        private double A, B, C;
-        public ICollection<Entity> teachingRow = Entity.GenerateEntities(
+        private double _a;
+        private double _b;
+        private double _c;
+
+        public ICollection<Entity> TeachingRow = Entity.GenerateEntities(
                 new[] { 2, 1, 2, 3, 4, 5, 6, 4, 5, 6 },
                 new[] { 2, 3, 3, 5, 4, 6, 5, 6, 5, 7 },
                 new[] { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1 }
@@ -18,14 +18,14 @@ namespace tpr2
 
         public Entity CalculateLine(double alpha)
         {
-            Entity weightVector = new Entity(1, 1, 1);
+            var weightVector = new Entity(1, 1, 1);
 
-            Int32 tag = 1, iter = 0, a = 1;
+            Int32 tag = 1, a = 1;
 
             while (tag != 0)
             {
                 tag = 0;
-                foreach (Entity e in teachingRow)
+                foreach (Entity e in TeachingRow)
                 {
 
                     Int32 resultY = weightVector.X * e.X + weightVector.Y * e.Y <= weightVector.Class ? 0 : 1;
@@ -55,7 +55,7 @@ namespace tpr2
                             }
                         case 3:
                             {
-                                weightVector.Class += alpha*(e.Class - resultY);
+                                weightVector.Class += alpha*(e.Class + resultY);
                                 a = 1;
                                 break;
                             }
@@ -65,21 +65,20 @@ namespace tpr2
                             }
                     }
                 }
-                ++iter;
             }
             return weightVector;
         }
 
         public void SetCoefficientes(Entity vector)
         {
-            A = vector.X;
-            B = vector.Y;
-            C = vector.Class;
+            _a = vector.X;
+            _b = vector.Y;
+            _c = vector.Class;
         }
 
-        public double f(double x)
+        public double F(double x)
         {
-            return (-C - A*x) / B;
+            return (_c - _a*x) / _b;
         }
 
     }

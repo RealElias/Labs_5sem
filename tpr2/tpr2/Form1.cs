@@ -53,36 +53,37 @@ namespace tpr2
             GraphPane pane = zedGraph.GraphPane;
             pane.CurveList.Clear();
 
-            PointPairList list = new PointPairList();
-            PointPairList class0list = new PointPairList();
-            PointPairList class1list = new PointPairList();
+            var list = new PointPairList();
+            var class0List = new PointPairList();
+            var class1List = new PointPairList();
 
-            double xmin = 0;
-            double xmax = 8;
-
-            for (double x = xmin; x <= xmax; x += 0.1)
+            for (double x = 0; x <= 8; x += 0.1)
             {
-                list.Add(x, core.f(x));
+                double f = core.F(x);
+                if(f < 8 && f > 0)
+                    list.Add(x, f);
             }
 
 
-            foreach (Entity e in core.teachingRow)
+            foreach (Entity e in core.TeachingRow)
             {
                 if (e.Class == 0)
-                    class0list.Add(e.X, e.Y);
+                    class0List.Add(e.X, e.Y);
                 else
-                    class1list.Add(e.X, e.Y);
+                    class1List.Add(e.X, e.Y);
             }
 
             LineItem myCurve = pane.AddCurve("Решающее правило", list, Color.Blue, SymbolType.None);
-            LineItem class0 = pane.AddCurve("Класс 0", class0list, Color.Green, SymbolType.Diamond);
-            LineItem class1 = pane.AddCurve("Класс 1", class1list, Color.Red, SymbolType.Triangle);
+            LineItem class0 = pane.AddCurve("Класс 0", class0List, Color.Green, SymbolType.Diamond);
+            LineItem class1 = pane.AddCurve("Класс 1", class1List, Color.Red, SymbolType.Triangle);
 
             class0.Line.IsVisible = false;
             class0.Symbol.Fill.Type = FillType.Solid;
             class1.Line.IsVisible = false;
             class1.Symbol.Fill.Type = FillType.Solid;
 
+            zedGraph.ScrollMaxY = 10;
+            zedGraph.ScrollMinY = 0;
             zedGraph.AxisChange();
 
             zedGraph.Invalidate();
