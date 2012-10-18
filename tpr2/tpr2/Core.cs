@@ -42,19 +42,27 @@ namespace tpr2
                     switch (a)
                     {
                         case 1:
-                            weightVector.X += alpha * e.X * (e.Class - resultY);
-                            ++a;
-                            break;
+                            {
+                                weightVector.X += alpha*e.X*(e.Class - resultY);
+                                ++a;
+                                break;
+                            }
                         case 2:
-                            weightVector.Y += alpha * e.Y * (e.Class - resultY);
-                            ++a;
-                            break;
+                            {
+                                weightVector.Y += alpha*e.Y*(e.Class - resultY);
+                                ++a;
+                                break;
+                            }
                         case 3:
-                            weightVector.Class += alpha * (e.Class + resultY);
-                            a = 1;
-                            break;
+                            {
+                                weightVector.Class += alpha*(e.Class - resultY);
+                                a = 1;
+                                break;
+                            }
                         default:
-                            break;
+                            {
+                                break;
+                            }
                     }
                 }
                 ++iter;
@@ -71,7 +79,7 @@ namespace tpr2
 
         public double f(double x)
         {
-            return (-C - A*x) / B + 19;
+            return (-C - A*x) / B;
         }
 
     }

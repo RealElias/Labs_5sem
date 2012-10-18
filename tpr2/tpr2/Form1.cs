@@ -25,7 +25,9 @@ namespace tpr2
         {
             if (maskedTextBox1.Text != "")
             {
+                Cursor = Cursors.WaitCursor;
                 Entity weightVector = core.CalculateLine(double.Parse(maskedTextBox1.Text));
+                Cursor = Cursors.Arrow;
                 textBox1.Text = weightVector.X.ToString() + "x + " + weightVector.Y.ToString() + "y + " + weightVector.Class.ToString() + " = 0";
                 core.SetCoefficientes(weightVector);
                 DrawGraph();
