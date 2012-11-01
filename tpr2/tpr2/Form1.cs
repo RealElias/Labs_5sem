@@ -25,7 +25,6 @@ namespace tpr2
             CurRule = new Entity();
             Calculate = false;
             core = new Core();
-            DrawGraph(core.AnalitCalculateLine());
         }
 
         private void bCalculate_Click(object sender, EventArgs e)
@@ -39,10 +38,11 @@ namespace tpr2
                 else
                 {
                     Cursor = Cursors.WaitCursor;
-                    Entity weightVector = core.CalculateLine(double.Parse(maskedTextBox1.Text), zedGraph);
+                    Entity weightVector = core.TeachCalculateLine(double.Parse(maskedTextBox1.Text));
                     textBox1.Text = weightVector.X.ToString() + "     " + weightVector.Y.ToString() + "     " +
                                     weightVector.Class.ToString();
                     CurRule = weightVector;
+                    DrawGraph(core.AnalitCalculateLine(), weightVector);
                     Cursor = Cursors.Arrow;
                     Calculate = true;
                 }
@@ -63,13 +63,14 @@ namespace tpr2
             }
         }
 
-        public void DrawGraph(Entity avector)
+        public void DrawGraph(Entity avector, Entity tvector)
         {
             GraphPane pane = zedGraph.GraphPane;
             pane.CurveList.Clear();
             ControlPoints.Clear();
 
             var lista = new PointPairList();
+            var listt = new PointPairList();
             var class0List = new PointPairList();
             var class1List = new PointPairList();
 
@@ -77,10 +78,19 @@ namespace tpr2
             for (double x = 2; x <= 6; x += 0.1)
             {
                 double f = core.F(x);
-                if (f < 16 && f > 0)
+                //if (f < 16 && f > 0)
                     lista.Add(x, f);
             }
-            pane.AddCurve("Решающее правило(аналит)", lista, Color.Blue, SymbolType.None);
+            pane.AddCurve("Решающее правило(аналит)", lista, Color.Chocolate, SymbolType.None);
+
+            core.SetCoefficientes(tvector);
+            for (double x = 2; x <= 6; x += 0.1)
+            {
+                double f = core.F(x);
+                if (f < 16 && f > 0)
+                    listt.Add(x, f);
+            }
+            pane.AddCurve("Решающее правило(обуч)", listt, Color.Blue, SymbolType.None);
 
             foreach (Entity e in core.TeachingRow)
             {

@@ -18,7 +18,7 @@ namespace tpr2
                 new[] { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1 }
                 );
 
-        public Entity CalculateLine(double alpha, ZedGraphControl zedGraph)
+        public Entity TeachCalculateLine(double alpha)
         {
             var weightVector = new Entity(1,1,1);
 
@@ -40,8 +40,6 @@ namespace tpr2
                     weightVector.X += alpha * e.X * (e.Class - resultY);
                     weightVector.Y += alpha * e.Y * (e.Class - resultY);
                     weightVector.Class += alpha * (e.Class - resultY);
-                    DrawRule(weightVector, zedGraph);
-                    Thread.Sleep(1000);
                 }
             }
             return weightVector;
@@ -80,35 +78,13 @@ namespace tpr2
             etalon1.Y = class1.Average(e => e.Y);
             averagePoint.X = (etalon0.X + etalon1.X)/2;
             averagePoint.Y = (etalon0.Y + etalon1.Y)/2;
-            Line.X = 1/(etalon0.X - etalon1.X);
-            Line.Y = 1/(etalon1.Y - etalon0.Y);
-            Line.Class = -Line.X * averagePoint.X - Line.Y * averagePoint.Y;
-            Perpendicular.X = Line.X/Line.Y;
+            Line.X = 1/(etalon1.X - etalon0.X);
+            Line.Y = -1/(etalon1.Y - etalon0.Y);
+            Line.Class = -Line.X * etalon0.X - Line.Y * etalon0.Y;
+            Perpendicular.X = -1 / (-Line.X / Line.Y);
             Perpendicular.Y = -1;
-            Perpendicular.Class = -averagePoint.X*Line.X/Line.Y + averagePoint.Y;
+            Perpendicular.Class = averagePoint.Y - Perpendicular.X * averagePoint.X;
             return Perpendicular;
-        }
-
-        public void DrawRule(Entity vector, ZedGraphControl zedGraph)
-        {
-            GraphPane pane = zedGraph.GraphPane;
-            var list = new PointPairList();
-
-            SetCoefficientes(vector);
-
-            //if(pane.CurveList.Count > 3)
-            //    pane.CurveList.RemoveAt(3);
-//            for (double x = 0; x <= 8; x += 0.1)
-//            {
-//                double f = F(x);
-////                if (f < 16 && f > 0)
-//                    list.Add(x, f);
-//            }
-            list.Add(0, F(0));
-            list.Add(8, F(8));
-            pane.AddCurve("Решающее правило(обуч)", list, Color.Chocolate, SymbolType.None);
-            zedGraph.AxisChange();
-            zedGraph.Invalidate();
         }
     }
 }
